@@ -9,6 +9,6 @@
 
 ```python 
 await database.connect(db_name="totobot", collection_name="transitions")
+
+# Es necesario cambiar totobot y transition por el nombre de la base de datos y de la coleccion en la cual se guardaran las transiciones
 ```
-    
-- Es necesario cambiar totobot y transition por el nombre de la base de datos y de la coleccion en la cual se guardaran las transiciones
