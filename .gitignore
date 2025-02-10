@@ -1,0 +1,42 @@
+# Archivos de Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Entorno virtual
+venv/
+.env/
+.venv/
+env/
+*.env
+
+# Configuración del IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs y cachés
+*.log
+*.sqlite3
+*.db
+
+# Archivos de dependencias
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Archivos de Jupyter Notebook
+.ipynb_checkpoints/
+
+# Archivos de compilación
+build/
+dist/
+*.egg-info/
+
+# Configuración de Docker
+.dockerignore
+
+# Archivos de Git
+.git/
