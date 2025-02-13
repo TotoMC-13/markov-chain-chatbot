@@ -54,10 +54,23 @@ nltk.download('punkt')     # Tokenizador de oraciones
 
 ## Configuración de la Base de Datos
 
+En el archivo `train.py`, busca la siguiente línea:
+
 ```python
 await database.connect(db_name="totobot", collection_name="transitions")
 ```
-Modificar `db_name` y `collection_name` según tu configuración.
+
+Y reemplaza:
+- `"totobot"` por el nombre de tu base de datos
+- `"transitions"` por el nombre de la colección donde se guardarán los datos
+
+Por ejemplo, si tu base de datos se llama "miproyecto" y quieres usar una colección llamada "markov_data":
+
+```python
+await database.connect(db_name="miproyecto", collection_name="markov_data")
+```
+
+> **Importante**: Este cambio debe hacerse antes de ejecutar el programa por primera vez, ya que determina dónde se guardarán los datos de entrenamiento.
 
 ## Detalles Técnicos
 
