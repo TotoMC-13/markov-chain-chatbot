@@ -7,77 +7,77 @@ import re
 
 class MarkovChain:
     def __init__(self, n=2):
-        self.n = n # Define la longitud de la cadena
+        self.n = n  # Define la longitud de la cadena
         self.chain = {}
         self.STOP_WORDS = {"y", "de", "el", "la", "los", "las", "en", "con", 
                           "para", "por", "que", "a", "o", "e", "un", "una", "del"}
 
-    def clear_text(self, texto):
-        if isinstance(texto, list):  
-            texto = " ".join(texto)
+    def clear_text(self, text):
+        if isinstance(text, list):  
+            text = " ".join(text)
 
-        texto = texto.lower()  # Convertir a minúsculas
-        texto = re.sub(r'\d+', '', texto)  # Eliminar números
-        texto = re.sub(r'[^\w\s]', '', texto)  # Eliminar puntuación
-        texto = re.sub(r'\s+', ' ', texto).strip()  # Eliminar espacios extra
-        palabras = word_tokenize(texto, "spanish") 
-        return palabras
+        text = text.lower()  # Convertir a minúsculas
+        text = re.sub(r'\d+', '', text)  # Eliminar números
+        text = re.sub(r'[^\w\s]', '', text)  # Eliminar puntuación
+        text = re.sub(r'\s+', ' ', text).strip()  # Eliminar espacios extra
+        words = word_tokenize(text, "spanish") 
+        return words
 
-    def create_transitions(self, texto):
-        tokens_limpios = self.clear_text(texto)
+    def create_transitions(self, text):
+        clean_tokens = self.clear_text(text)
 
-        for i in range(len(tokens_limpios) - self.n + 1):
+        for i in range(len(clean_tokens) - self.n + 1):
             # Clave: Tupla de (n-1) palabras consecutivas
-            clave = tuple(tokens_limpios[i:i+self.n-1])
+            key = tuple(clean_tokens[i:i+self.n-1])
             """
             Ejemplo con n = 3:
             Si el texto es: ["hola", "como", "estas", "hoy"]
             
-            - i = 0 → clave = ("hola", "como")  → siguiente_palabra = "estas"
-            - i = 1 → clave = ("como", "estas") → siguiente_palabra = "hoy"
+            - i = 0 → key = ("hola", "como") → next_word = "estas"
+            - i = 1 → key = ("como", "estas") → next_word = "hoy"
             
-            Esto permite construir una cadena de Markov de orden n-1.
+            Esto construye una cadena de Markov de orden n-1.
             """
 
             # Palabra que sigue después de la clave
-            siguiente_palabra = tokens_limpios[i+self.n-1]
+            next_word = clean_tokens[i+self.n-1]
 
-            # Se almacena la relación en el diccionario de transiciones
-            if clave not in self.chain:
-                self.chain[clave] = {siguiente_palabra: 1}
+            # Almacena la relación en el diccionario de transiciones
+            if key not in self.chain:
+                self.chain[key] = {next_word: 1}
             else:
-                if siguiente_palabra not in self.chain[clave]:
-                    self.chain[clave][siguiente_palabra] = 1
+                if next_word not in self.chain[key]:
+                    self.chain[key][next_word] = 1
                 else:
-                    self.chain[clave][siguiente_palabra] += 1
+                    self.chain[key][next_word] += 1
 
     async def generate_text(self, database, initial_chain, max_length=50):
-        texto = []
+        text = []
         chain = initial_chain
 
-        while len(texto) < max_length or texto[-1] in self.STOP_WORDS:
+        while len(text) < max_length or text[-1] in self.STOP_WORDS:
             next_words = await database.get_next_words(chain=chain)
-            proxima_palabra = self.get_next_word(chain, next_words)
+            next_word = self.get_next_word(chain, next_words)
             
-            if not proxima_palabra:
+            if not next_word:
                 break
                 
-            texto.append(proxima_palabra)
+            text.append(next_word)
             
             if self.n > 2:
-                chain = chain[-(self.n - 2):] + [proxima_palabra]
+                chain = chain[-(self.n - 2):] + [next_word]
             else:
-                chain = [proxima_palabra]
+                chain = [next_word]
 
-        return texto
+        return text
 
     def get_next_word(self, chain: list, all_words: dict):
-        """Usa las probabilidades de la cadena de Markov para elegir la proxima palabra"""
+        """Usa las probabilidades de la cadena de Markov para elegir la siguiente palabra"""
         if not all_words:  
             return None  # Si no hay coincidencia
 
-        words, weights = zip(*all_words.items())  # Extraer palabras y probabilidades
-        return random.choices(words, weights=weights)[0]  # Devuelve una palabra
+        words, weights = zip(*all_words.items())  # Extrae palabras y probabilidades
+        return random.choices(words, weights=weights)[0]  # Devuelve una palabra aleatoria
 
     def data_to_db(self):
         data = []
