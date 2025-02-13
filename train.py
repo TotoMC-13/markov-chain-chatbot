@@ -2,9 +2,16 @@ import nltk
 import os
 import asyncio
 import random
-from nltk.corpus import cess_esp
+from nltk.corpus import cess_esp, conll2002  # Removido eseunavela
 from markov_chain import MarkovChain
 from db_handler import AsyncDatabaseConnection, DatabaseConnectionError
+
+# Descarga de recursos NLTK necesarios (descomentar en la primera ejecución)
+"""
+nltk.download('cess_esp')    # Corpus en español general
+nltk.download('conll2002')   # Corpus de noticias en español
+nltk.download('punkt')       # Tokenizador de oraciones
+"""
 
 def clear_screen():
     """Limpia la pantalla de la consola"""
@@ -21,11 +28,44 @@ def print_text_result(text):
     input("\nPresione Enter para continuar...")
     clear_screen()
 
-# Descarga de recursos NLTK necesarios (descomentar en la primera ejecución)
-"""
-nltk.download('cess_esp')  # Corpus en español
-nltk.download('punkt')     # Tokenizador de oraciones
-"""
+def get_corpus_words(corpus_choice):
+    """Obtiene palabras del corpus seleccionado"""
+    words = []
+    try:
+        if corpus_choice == 1:
+            text = cess_esp.sents()
+            print("Usando corpus CESS-ESP (textos generales)...")
+        elif corpus_choice == 2:
+            # Corrección en el acceso al corpus CoNLL-2002
+            text = conll2002.iob_sents('esp.train') + conll2002.iob_sents('esp.testa')
+            # Extraer solo las palabras, ignorando las etiquetas
+            words = [word for sent in text for word, pos, chunk in sent]
+            print("Usando corpus CoNLL-2002 (noticias)...")
+            return words
+        elif corpus_choice == 3:
+            # Combinar todos los corpus disponibles
+            text1 = cess_esp.sents()
+            text2 = conll2002.iob_sents('esp.train') + conll2002.iob_sents('esp.testa')
+            words = []
+            # Procesar CESS-ESP
+            for sent in text1:
+                words.extend(sent)
+            # Procesar CoNLL-2002
+            for sent in text2:
+                words.extend(word for word, pos, chunk in sent)
+            print("Usando todos los corpus disponibles...")
+            return words
+        else:
+            raise ValueError("Opción de corpus no válida")
+
+        # Solo para CESS-ESP (corpus_choice == 1)
+        for sentence in text:
+            for word in sentence:
+                words.append(word)
+        return words
+    except Exception as e:
+        print(f"Error al cargar el corpus: {e}")
+        return []
 
 # URL para la conexión a la base de datos
 url = os.getenv("DB_URL")
@@ -58,13 +98,17 @@ async def main():
                     print("La longitud de la cadena no puede ser menor a 2")
                     chain_length = int(input("Longitud de la cadena: "))
 
-                # Usamos el corpus cess_esp que contiene textos en español
-                text = cess_esp.sents()
-                words = []
+                print("\nCorpus disponibles:")
+                print("1. CESS-ESP (Textos generales)")
+                print("2. CoNLL-2002 (Noticias)")
+                print("3. Todos los corpus combinados")
+                corpus_choice = int(input("\nSeleccione el corpus a utilizar: "))
 
-                for sentence in text:
-                    for word in sentence:
-                        words.append(word)
+                words = get_corpus_words(corpus_choice)
+                if not words:
+                    print("No se pudo cargar el corpus")
+                    input("\nPresione Enter para continuar...")
+                    continue
 
                 markov = MarkovChain(n=chain_length)
                 markov.create_transitions(words)

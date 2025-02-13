@@ -26,8 +26,9 @@ url = "mongodb://localhost:27017"  # Reemplazar con tu URL
 4. Descargar recursos NLTK:
    - Descomentar las siguientes líneas en `train.py` en la primera ejecución:
 ```python
-nltk.download('cess_esp')  # Corpus en español
-nltk.download('punkt')     # Tokenizador de oraciones
+nltk.download('cess_esp')    # Corpus en español general
+nltk.download('conll2002')   # Corpus de noticias en español
+nltk.download('punkt')       # Tokenizador de oraciones
 ```
 
 ## Uso
@@ -95,6 +96,35 @@ await database.connect(db_name="miproyecto", collection_name="markov_data")
 - A mayor longitud de cadena, más coherente pero menos creativo será el texto
 - Es necesario mantener la misma longitud de cadena al entrenar y generar
 - El corpus CESS-ESP proporciona un conjunto limitado de textos en español
+
+## Corpus Disponibles
+
+El sistema soporta los siguientes corpus en español de NLTK:
+
+1. **CESS-ESP**: Corpus general del español
+   - Incluye textos variados y anotados
+   - Mejor para generación de texto general
+
+2. **CoNLL-2002**: Corpus de noticias en español
+   - Contiene textos periodísticos
+   - Mejor para generar texto formal o de noticias
+
+3. **Combinado**: Todos los corpus anteriores juntos
+   - Mayor variedad de vocabulario
+   - Puede generar textos más diversos
+
+Para utilizar estos corpus, descomentar las siguientes líneas en `train.py`:
+
+```python
+nltk.download('cess_esp')    # Corpus general
+nltk.download('conll2002')   # Corpus de noticias
+nltk.download('punkt')       # Tokenizador
+```
+
+### Consideraciones sobre los Corpus
+- CESS-ESP: Mejor para texto general y variado
+- CoNLL-2002: Mejor para estilo periodístico y formal
+- Combinado: Mayor variedad pero puede mezclar estilos
 
 ## Limitaciones Conocidas
 
