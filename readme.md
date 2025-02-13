@@ -36,7 +36,7 @@ nltk.download('punkt')       # Tokenizador de oraciones
 1. **Entrenar el modelo**:
    - Seleccionar opción 1
    - Ingresar longitud de cadena (mínimo 2)
-   - El sistema entrenará usando el corpus CESS-ESP
+   - El sistema entrenará usando el/los corpus seleccionado/s
 
 2. **Generar texto**:
    - Seleccionar opción 3
