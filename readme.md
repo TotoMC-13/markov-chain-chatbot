@@ -1,6 +1,6 @@
 # Generador de Texto con Cadenas de Markov
 
-Este proyecto implementa un generador de texto basado en Cadenas de Markov utilizando el corpus CESS-ESP de NLTK.
+Este proyecto implementa un generador de texto basado en Cadenas de Markov utilizando el corpus CESS-ESP y CoNLL-2002 de NLTK.
 
 ## Requisitos Previos
 
