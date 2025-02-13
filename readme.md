@@ -113,19 +113,6 @@ El sistema soporta los siguientes corpus en español de NLTK:
    - Mayor variedad de vocabulario
    - Puede generar textos más diversos
 
-Para utilizar estos corpus, descomentar las siguientes líneas en `train.py`:
-
-```python
-nltk.download('cess_esp')    # Corpus general
-nltk.download('conll2002')   # Corpus de noticias
-nltk.download('punkt')       # Tokenizador
-```
-
-### Consideraciones sobre los Corpus
-- CESS-ESP: Mejor para texto general y variado
-- CoNLL-2002: Mejor para estilo periodístico y formal
-- Combinado: Mayor variedad pero puede mezclar estilos
-
 ## Limitaciones Conocidas
 
 - Solo funciona con texto en español
