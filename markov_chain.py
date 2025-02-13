@@ -1,4 +1,5 @@
 import nltk
+from db_handler import AsyncDatabaseConnection
 from nltk.tokenize import word_tokenize
 from nltk.corpus import cess_esp
 import random
@@ -8,6 +9,8 @@ class MarkovChain:
     def __init__(self, n=2):
         self.n = n # Define la longitud de la cadena
         self.chain = {}
+        self.STOP_WORDS = {"y", "de", "el", "la", "los", "las", "en", "con", 
+                          "para", "por", "que", "a", "o", "e", "un", "una", "del"}
 
     def clear_text(self, texto):
         if isinstance(texto, list):  
@@ -47,6 +50,34 @@ class MarkovChain:
                     self.chain[clave][siguiente_palabra] = 1
                 else:
                     self.chain[clave][siguiente_palabra] += 1
+
+    async def generate_text(self, database, initial_chain, max_length=50):
+        texto = []
+        chain = initial_chain
+
+        while len(texto) < max_length or texto[-1] in self.STOP_WORDS:
+            next_words = await database.get_next_words(chain=chain)
+            proxima_palabra = self.get_next_word(chain, next_words)
+            
+            if not proxima_palabra:
+                break
+                
+            texto.append(proxima_palabra)
+            
+            if self.n > 2:
+                chain = chain[-(self.n - 2):] + [proxima_palabra]
+            else:
+                chain = [proxima_palabra]
+
+        return texto
+
+    def get_next_word(self, chain: list, all_words: dict):
+        """Usa las probabilidades de la cadena de Markov para elegir la proxima palabra"""
+        if not all_words:  
+            return None  # Si no hay coincidencia
+
+        words, weights = zip(*all_words.items())  # Extraer palabras y probabilidades
+        return random.choices(words, weights=weights)[0]  # Devuelve una palabra
 
     def data_to_db(self):
         data = []

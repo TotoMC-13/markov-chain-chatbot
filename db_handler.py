@@ -1,4 +1,5 @@
 import motor.motor_asyncio
+import random
 
 class AsyncDatabaseConnection:
     def __init__(self, url: str):
@@ -12,9 +13,11 @@ class AsyncDatabaseConnection:
 
     async def read_all(self):
         cursor = self.collection.find()
-        documents = await cursor.to_list(length=None)
-        for doc in documents[:1]:
-            print(doc)
+        return await cursor.to_list(length=None)
+    
+    async def get_next_words(self, chain: list):
+        cursor = await self.collection.find_one({"context": chain})
+        return cursor["next_words"] if cursor else None
 
     async def delete_all(self):
         result = await self.collection.delete_many({})
